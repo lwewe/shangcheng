@@ -7,7 +7,7 @@
         <!-- add景区 -->
         <div class="listItem" v-if="item.ord_bs == 9" @click="toScenicOrder(item.id)">
           <div class="reserve"><span class="circles"></span>预定日期：<span class="clr_2">{{ timestampToTime(item.add_time)
-              }}</span></div>
+          }}</span></div>
           <div class="flex_box">
             <div class="flex_top">
               <div class="flex-bet"><img :src="hsjd" class="img" alt=""><span>景区门票</span></div>
@@ -250,6 +250,40 @@
           <!--            <div class="cancel">删除订单</div>-->
           <!--            &lt;!&ndash;          <div class="cancel toPay">去支付</div>&ndash;&gt;-->
           <!--          </div>-->
+        </div>
+        <!--    爷爷不泡茶 ord_bs == 10-->
+        <div class="listItem" v-else-if="item.ord_bs == 10" @click="toTeaOrder(item.id)">
+          <div class="orderNo">
+            <div class="orderNum orderTime">订单号:{{ item.order_no }}</div>
+            <div>
+              <div class="otherType" v-if="Number(item.orderstatus) == 4">已退款</div>
+              <div class="otherType" v-else-if="Number(item.orderstatus) == 2">已完成</div>
+              <div class="otherType" v-else>处理中</div>
+            </div>
+          </div>
+          <div class="filmBox" style="margin-bottom: 5px">
+            <div class="film">
+              <div class="filmImg cardImg">
+                <img class="img"
+                  :src="(item.brandInfo && item.brandInfo.logoThumbUrl) ? item.brandInfo.logoThumbUrl : 'http://yxfmm.bjyxfl.com/imgs/default-image.png'"
+                  alt="">
+              </div>
+              <div class="rightBox">
+                <div class="filmName">{{ item.shopName || item.brandName }}</div>
+                <div class="startTime textBox" style="margin-top: 0px">{{ item.brandName }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="priceBox" style="margin-top: 3px">
+            <div>
+              共{{ safeParse(item.fuli).length }}件商品
+              <!-- <span v-if="Number(item.refundAmount) > 0" style="color:#EE3F45;margin-left:6px;">已退￥{{ item.refundAmount }}</span> -->
+            </div>
+            <div>
+              总计: <span class="priceNum"><span style="font-size: 12px">￥</span>{{ item.total_fee || item.price
+                }}</span><span class="first">元</span>
+            </div>
+          </div>
         </div>
         <!--        蛋糕-->
         <!--        蛋糕/电子券-->
@@ -508,6 +542,19 @@ export default {
       sessionStorage.removeItem("resultMoviegoer")
       sessionStorage.removeItem("StoreName")
       window.location.href = this.$store.state.perUrl + "/paymentpage?id=" + id
+    },
+    // 安全解析字符串化 JSON（fuli 等字段异常时兜底）
+    safeParse(str) {
+      try {
+        const v = JSON.parse(str || '[]')
+        return Array.isArray(v) ? v : []
+      } catch (e) {
+        return []
+      }
+    },
+    // 爷爷不泡茶详情跳转（路径按你项目实际路由改）
+    toTeaOrder(id) {
+      window.location.href = this.$store.state.cakeUrl + "/TeaOrderDetail?id=" + id
     },
     toPerOrder(id) {
       window.location.href = this.$store.state.perUrl + "/orderpage?id=" + id
